@@ -3,7 +3,7 @@
 
 #define MAX_EVENTS 2
 
-struct epoll_event ep_ev[MAX_EVENTS];
+struct epoll_event ep_evs[MAX_EVENTS];
 int client_fds[MAX_CLIENTS];
 char *mess;
 
@@ -52,7 +52,7 @@ int main(){
   struct epoll_event event;
   memset(&event, 0, sizeof(struct epoll_event));
   event.data.fd = listen_sock;
-  event.events = EPOLL_IN;
+  event.events = EPOLLIN;
 
   epoll_ctl(epfd, EPOLL_CTL_ADD, listen_sock, &event);
 
@@ -79,7 +79,7 @@ int main(){
 
   
   while (1){
-    int num_events = epoll_wait(epfd, &ep_evs, MAX_EVENTS, -1);
+    int num_events = epoll_wait(epfd, ep_evs, MAX_EVENTS, -1);
     for (int i=0; i<num_events; i++){
       int fd = ep_evs[i].data.fd;
       char c;
