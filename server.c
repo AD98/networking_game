@@ -6,7 +6,7 @@
 struct epoll_event ep_evs[MAX_EVENTS];
 int client_fds[MAX_CLIENTS];
 char *mess;
-
+int i;
 
 void broadcast_to_clients(char *str, int num_clients);
 
@@ -75,12 +75,12 @@ int main(){
   }
   
   printf("All connections made\n");
-  broadcast_to_clients("READY\n", MAX_CLIENTS);
+  broadcast_to_clients("READY ", MAX_CLIENTS);
 
   
   while (1){
     int num_events = epoll_wait(epfd, ep_evs, MAX_EVENTS, -1);
-    for (int i=0; i<num_events; i++){
+    for (i=0; i<num_events; i++){
       int fd = ep_evs[i].data.fd;
       char c;
       int bytes = read(fd, &c, 1);
@@ -88,19 +88,19 @@ int main(){
 
       int player = (fd == client_fds[0]) ? 1 : 2;
       asprintf(&mess, "MESSAGE Player %d typed: %c\n", player, c);
-      dprintf(client_fds[(player+1)%2], "%s", mess);
+      dprintf(client_fds[player%2], "%s", mess);
       free(mess);
     }
   }
   
   
   close(listen_sock);
-  for (int i=0; i<MAX_CLIENTS; i++)
+  for (i=0; i<MAX_CLIENTS; i++)
     close(client_fds[i]);
   freeaddrinfo(result);
 }
 
 void broadcast_to_clients(char* str, int num_clients){
-  for (int i=0; i<num_clients; i++)
+  for (i=0; i<num_clients; i++)
     dprintf(client_fds[i], "%s", str);
 }

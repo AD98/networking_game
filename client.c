@@ -1,4 +1,5 @@
 #include "common.h"
+#include <pthread.h>
 
 int main(){
   
@@ -35,10 +36,11 @@ int main(){
   
   printf("BEGIN\n");
 
+
   system("stty raw");
   while (1){
     char c = getchar();
-    if (c == '\r')
+    if ((c == '\r') || (c == '\n'))
       break;
     write(server_sock, &c, 1);
     char buf[100];
